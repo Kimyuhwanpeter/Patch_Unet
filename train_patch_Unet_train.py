@@ -10,15 +10,15 @@ import os
 
 FLAGS = easydict.EasyDict({"img_size": 448,
 
-                           "train_txt_path": "D:/[1]DB/[5]4th_paper_DB/crop_weed/datasets_IJRR2017/train.txt",
+                           "train_txt_path": "/yuhwan/yuhwan/Dataset/Segmentation/Crop_weed/datasets_IJRR2017/train.txt",
 
-                           "val_txt_path": "D:/[1]DB/[5]4th_paper_DB/crop_weed/datasets_IJRR2017/val.txt",
+                           "val_txt_path": "/yuhwan/yuhwan/Dataset/Segmentation/Crop_weed/datasets_IJRR2017/val.txt",
 
-                           "test_txt_path": "D:/[1]DB/[5]4th_paper_DB/crop_weed/datasets_IJRR2017/test.txt",
+                           "test_txt_path": "/yuhwan/yuhwan/Dataset/Segmentation/Crop_weed/datasets_IJRR2017/test.txt",
                            
-                           "label_path": "D:/[1]DB/[5]4th_paper_DB/crop_weed/datasets_IJRR2017/raw_aug_gray_mask/",
+                           "label_path": "/yuhwan/yuhwan/Dataset/Segmentation/Crop_weed/datasets_IJRR2017/raw_aug_gray_mask/",
                            
-                           "image_path": "D:/[1]DB/[5]4th_paper_DB/crop_weed/datasets_IJRR2017/raw_aug_rgb_img/",
+                           "image_path": "/yuhwan/yuhwan/Dataset/Segmentation/Crop_weed/datasets_IJRR2017/raw_aug_rgb_img/",
                            
                            "pre_checkpoint": False,
                            
@@ -34,13 +34,13 @@ FLAGS = easydict.EasyDict({"img_size": 448,
 
                            "ignore_label": 0,
 
-                           "batch_size": 4,
+                           "batch_size": 10,
 
-                           "sample_images": "/yuwhan/Edisk/yuwhan/Edisk/Segmentation/Seg_Enet/BoniRob/sample_images",
+                           "sample_images": "/yuhwan/yuhwan/checkpoint/Segmenation/Path_Unet/BoniRob/sample_images",
 
-                           "save_checkpoint": "/yuwhan/Edisk/yuwhan/Edisk/Segmentation/Seg_Enet/BoniRob/checkpoint",
+                           "save_checkpoint": "/yuhwan/yuhwan/checkpoint/Segmenation/Path_Unet/BoniRob/checkpoint",
 
-                           "save_print": "C:/Users/Yuhwan/Downloads/train_out.txt",
+                           "save_print": "/yuhwan/yuhwan/checkpoint/Segmenation/Path_Unet/BoniRob/train_out.txt",
 
                            "test_images": "D:/[1]DB/[5]4th_paper_DB/crop_weed/related_work/SegNet/rice_seedling_weed/test_images",
 
@@ -137,7 +137,7 @@ def dice_loss(y_true, y_pred):
     return 1 - numerator / denominator
 
 @tf.function
-def cal_loss(model, images, batch_labels, a):
+def cal_loss(model, images, batch_labels):
 
     with tf.GradientTape() as tape:
 
@@ -295,15 +295,15 @@ def main():
 
                     miou_, crop_iou_, weed_iou_ = Measurement(predict=predict_image,
                                         label=batch_label, 
-                                        shape=[384*512, ], 
+                                        shape=[FLAGS.img_size*FLAGS.img_size, ], 
                                         total_classes=FLAGS.total_classes).MIOU()
                     f1_score_, recall_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).F1_score_and_recall()
                     tdr_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).TDR()
 
                     miou += miou_
@@ -360,15 +360,15 @@ def main():
 
                     miou_, crop_iou_, weed_iou_ = Measurement(predict=predict_image,
                                         label=batch_label, 
-                                        shape=[384*512, ], 
+                                        shape=[FLAGS.img_size*FLAGS.img_size, ], 
                                         total_classes=FLAGS.total_classes).MIOU()
                     f1_score_, recall_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).F1_score_and_recall()
                     tdr_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).TDR()
 
                     miou += miou_
@@ -420,15 +420,15 @@ def main():
 
                     miou_, crop_iou_, weed_iou_ = Measurement(predict=predict_image,
                                         label=batch_label, 
-                                        shape=[384*512, ], 
+                                        shape=[FLAGS.img_size*FLAGS.img_size, ], 
                                         total_classes=FLAGS.total_classes).MIOU()
                     f1_score_, recall_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).F1_score_and_recall()
                     tdr_ = Measurement(predict=predict_image,
                                             label=batch_label,
-                                            shape=[384*512, ],
+                                            shape=[FLAGS.img_size*FLAGS.img_size, ],
                                             total_classes=FLAGS.total_classes).TDR()
 
                     miou += miou_
