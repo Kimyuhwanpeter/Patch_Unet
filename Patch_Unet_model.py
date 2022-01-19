@@ -1,63 +1,73 @@
 # -*- coding:utf-8 -*-
 
 import tensorflow as tf
-
+from tensorflow.keras.layers import *
 
 def Path_Unet(input_shape=(512, 512, 3), classes=3):
     
-    h = inputs = tf.keras.Input(input_shape)
+    bakcbone = tf.keras.applications.VGG16(input_shape=(224, 224, 3))
+    
+    inputs = tf.keras.Input(input_shape)
 
-    h1 = tf.keras.layers.Conv2D(filters=16, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h)
-    h1 = tf.keras.layers.Dropout(0.1)(h1)
-    h1 = tf.keras.layers.Conv2D(filters=16, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h1)
-    p1 = tf.keras.layers.MaxPool2D((2,2))(h1)
+    c1 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (inputs)
+    c1 = Dropout(0.1) (c1)
+    c1 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c1)
+    p1 = MaxPooling2D((2, 2)) (c1)
 
-    h2 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(p1)
-    h2 = tf.keras.layers.Dropout(0.1)(h2)
-    h2 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h2)
-    p2 = tf.keras.layers.MaxPool2D((2,2))(h2)
+    c2 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (p1)
+    c2 = Dropout(0.1) (c2)
+    c2 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c2)
+    p2 = MaxPooling2D((2, 2)) (c2)
 
-    h3 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(p2)
-    h3 = tf.keras.layers.Dropout(0.2)(h3)
-    h3 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h3)
-    p3 = tf.keras.layers.MaxPool2D((2,2))(h3)
+    c3 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (p2)
+    c3 = Dropout(0.2) (c3)
+    c3 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c3)
+    p3 = MaxPooling2D((2, 2)) (c3)
 
-    h4 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(p3)
-    h4 = tf.keras.layers.Dropout(0.2)(h4)
-    h4 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h4)
-    p4 = tf.keras.layers.MaxPool2D((2,2))(h4)
+    c4 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (p3)
+    c4 = Dropout(0.2) (c4)
+    c4 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c4)
+    p4 = MaxPooling2D(pool_size=(2, 2)) (c4)
 
-    h5 = tf.keras.layers.Conv2D(filters=256, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(p4)
-    h5 = tf.keras.layers.Dropout(0.3)(h5)
-    h5 = tf.keras.layers.Conv2D(filters=256, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h5)
+    c5 = Conv2D(256, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (p4)
+    c5 = Dropout(0.3) (c5)
+    c5 = Conv2D(256, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c5)
 
-    d6 = tf.keras.layers.Conv2DTranspose(filters=128, kernel_size=2, strides=2, padding="same")(h5)
-    d6 = tf.keras.layers.concatenate([d6, h4], -1)
-    h6 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(d6)
-    h6 = tf.keras.layers.Dropout(0.2)(h6)
-    h6 = tf.keras.layers.Conv2D(filters=128, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h6)
+    u6 = Conv2DTranspose(128, (2, 2), strides=(2, 2), padding='same') (c5)
+    u6 = concatenate([u6, c4])
+    c6 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (u6)
+    c6 = Dropout(0.2) (c6)
+    c6 = Conv2D(128, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c6)
 
-    d7 = tf.keras.layers.Conv2DTranspose(filters=64, kernel_size=2, strides=2, padding="same")(h6)
-    d7 = tf.keras.layers.concatenate([d7, h3], -1)
-    h7 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(d7)
-    h7 = tf.keras.layers.Dropout(0.2)(h7)
-    h7 = tf.keras.layers.Conv2D(filters=64, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h7)
+    u7 = Conv2DTranspose(64, (2, 2), strides=(2, 2), padding='same') (c6)
+    u7 = concatenate([u7, c3])
+    c7 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (u7)
+    c7 = Dropout(0.2) (c7)
+    c7 = Conv2D(64, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c7)
 
-    d8 = tf.keras.layers.Conv2DTranspose(filters=32, kernel_size=2, strides=2, padding="same")(h7)
-    d8 = tf.keras.layers.concatenate([d8, h2], -1)
-    h8 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(d8)
-    h8 = tf.keras.layers.Dropout(0.1)(h8)
-    h8 = tf.keras.layers.Conv2D(filters=32, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(h8)
+    u8 = Conv2DTranspose(32, (2, 2), strides=(2, 2), padding='same') (c7)
+    u8 = concatenate([u8, c2])
+    c8 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (u8)
+    c8 = Dropout(0.1) (c8)
+    c8 = Conv2D(32, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (c8)
 
-    d9 = tf.keras.layers.Conv2DTranspose(filters=16, kernel_size=2, strides=2, padding="same")(h8)
-    d9 = tf.keras.layers.concatenate([d9, h1], -1)
-    h9 = tf.keras.layers.Conv2D(filters=16, kernel_size=3, activation='elu', kernel_initializer="he_normal", padding="same")(d9)
-    h9 = tf.keras.layers.Dropout(0.1)(h9)
+    u9 = Conv2DTranspose(16, (2, 2), strides=(2, 2), padding='same') (c8)
+    u9 = concatenate([u9, c1], axis=3)
+    c9 = Conv2D(16, (3, 3), activation='elu', kernel_initializer='he_normal', padding='same') (u9)
+    c9 = Dropout(0.1) (c9)
 
-    h10 = tf.keras.layers.Conv2D(filters=classes, kernel_size=1, strides=1)(h9)
+    c10 = Convolution2D(classes, 1, 1)(c9)
 
-    return tf.keras.Model(inputs=inputs, outputs=h10)
+    model = tf.keras.Model(inputs=inputs, outputs=c10)
 
+    # model.get_layer("conv2").set_weights(bakcbone.get_layer("block1_conv2").get_weights())
+    # model.get_layer("conv3").set_weights(bakcbone.get_layer("block2_conv1").get_weights())
+    # model.get_layer("conv4").set_weights(bakcbone.get_layer("block2_conv2").get_weights())
+    # model.get_layer("conv5").set_weights(bakcbone.get_layer("block3_conv1").get_weights())
+    # model.get_layer("conv6").set_weights(bakcbone.get_layer("block3_conv3").get_weights())
+
+
+    return model
 
 #import cv2
 #import numpy as np
